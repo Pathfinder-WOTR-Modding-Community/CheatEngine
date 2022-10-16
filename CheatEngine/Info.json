@@ -1,0 +1,10 @@
+﻿{
+  "Id": "CheatEngine",
+  "DisplayName": "Cheat Engine",
+  "Author": "Bubbles & WittleWolfie",
+  "Version": "0.1.0",
+  "ManagerVersion": "0.21.3",
+  "AssemblyName": "CheatEngine.dll",
+  "EntryMethod": "CheatEngine.Main.Load",
+  "Requirements": []
+}
