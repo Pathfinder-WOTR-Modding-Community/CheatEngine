@@ -41,6 +41,12 @@
     <Reference Include="Assembly-CSharp-firstpass.dll">
       <HintPath>$(WrathPath)\Wrath_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
+    <Reference Include="Owlcat.SharedTypes.dll">
+      <HintPath>$(WrathPath)\Wrath_Data\Managed\Owlcat.SharedTypes.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule.dll">
+      <HintPath>$(WrathPath)\Wrath_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
 
     <!-- UMM & Harmony -->
     <Reference Include="0Harmony">
