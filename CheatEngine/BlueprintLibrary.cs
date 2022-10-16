@@ -34,14 +34,14 @@ namespace CheatEngine
   /// they exist in the base game.
   /// </para>
   /// </remarks>
-  public class BlueprintLibrary
+  public static class BlueprintLibrary
   {
     private static readonly ModLogger Logger = Logging.GetLogger(nameof(BlueprintLibrary));
 
     private static readonly ConcurrentDictionary<BlueprintGuid, SimpleBlueprint> LoadedBlueprints = new();
 
     private static SimpleBlueprint[] BaseBlueprints;
-    private static Thread MainThread;
+    private static Thread LoadThread;
 
     private static void LoadBlueprints()
     {
@@ -49,8 +49,8 @@ namespace CheatEngine
       {
         Logger.Log($"Starting Blueprint load.");
 
-        MainThread = new Thread(new ThreadStart(LoadMain));
-        MainThread.Start();
+        LoadThread = new Thread(new ThreadStart(LoadMain));
+        LoadThread.Start();
       }
       catch (Exception e)
       {
