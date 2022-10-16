@@ -47,7 +47,7 @@ namespace CheatEngine
       {
         try
         {
-          var nameSearch = "(Cleric|Warpriest)";
+          var nameSearch = "(Cleric|EldritchHeritage)"; // EldritchHeritage is from COP
           Logger.Log($"Searching for {nameSearch}");
           var stopwatch = Stopwatch.StartNew();
           var results = BlueprintLibrary.SearchByName(nameSearch);
@@ -55,9 +55,7 @@ namespace CheatEngine
           stopwatch.Stop();
           Logger.Log($"Search finished in {stopwatch.Elapsed} with {count} results");
           foreach (var bp in results)
-          {
-            Logger.NativeLog($"Found: {string.Join("\n", results.Select(bp => $"{bp.name} - {bp.GetType()}"))}");
-          }
+            Logger.NativeLog($"Found: {bp.name} - {bp.GetType()}");
 
           var guidSearch = "abcd";
           Logger.Log($"Searching for {guidSearch}");
@@ -67,9 +65,7 @@ namespace CheatEngine
           stopwatch.Stop();
           Logger.Log($"Search finished in {stopwatch.Elapsed} with {count} results");
           foreach (var bp in results)
-          {
-            Logger.NativeLog($"Found: {string.Join("\n", results.Select(bp => $"{bp.name} - {bp.GetType()}"))}");
-          }
+            Logger.NativeLog($"Found: {bp.name} - {bp.GetType()}");
 
           var descriptionSearch = "competence bonus";
           Logger.Log($"Searching for {descriptionSearch}");
@@ -79,9 +75,7 @@ namespace CheatEngine
           stopwatch.Stop();
           Logger.Log($"Search finished in {stopwatch.Elapsed} with {count} results");
           foreach (var bp in results)
-          {
-            Logger.NativeLog($"Found: {string.Join("\n", results.Select(bp => $"{bp.name} - {bp.GetType()}"))}");
-          }
+            Logger.NativeLog($"Found: {bp.name} - {bp.GetType()}");
         }
         catch (Exception e)
         {
