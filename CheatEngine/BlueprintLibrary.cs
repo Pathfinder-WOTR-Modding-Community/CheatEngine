@@ -71,7 +71,28 @@ namespace CheatEngine
         if (blueprintTypes.Any() && !blueprintTypes.Contains(type => type == bp.GetType()))
           continue;
 
-        if (IsLocalizedNameMatch(bp, guidPattern))
+        if (Regex.IsMatch(bp.AssetGuid.ToString(), guidPattern))
+          yield return ResourcesLibrary.TryGetBlueprint(bp.AssetGuid);
+      }
+      yield break;
+    }
+
+    /// <param name="descriptionPattern">Regex search string</param>
+    /// <param name="blueprintTypes">If specified, only blueprints of these types are returned</param>
+    /// <returns>
+    /// Blueprints with descriptions matching <paramref name="descriptionPattern"/>, of any type in <paramref name="blueprintTypes"/>
+    /// </returns>
+    public static IEnumerable<SimpleBlueprint> SearchByDescription(string descriptionPattern, params Type[] blueprintTypes)
+    {
+      if (!ReadyForSearch())
+        yield break;
+
+      foreach (var bp in LoadedBlueprints.Values)
+      {
+        if (blueprintTypes.Any() && !blueprintTypes.Contains(type => type == bp.GetType()))
+          continue;
+
+        if (IsLocalizedDescriptionMatch(bp, descriptionPattern))
           yield return ResourcesLibrary.TryGetBlueprint(bp.AssetGuid);
       }
       yield break;
