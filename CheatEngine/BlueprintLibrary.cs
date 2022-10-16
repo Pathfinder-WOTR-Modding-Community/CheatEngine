@@ -27,11 +27,7 @@ using static UnityModManagerNet.UnityModManager.ModEntry;
 
 namespace CheatEngine
 {
-  /// <summary>
-  /// Tracks all blueprints in the game. 
-  /// 
-  /// 
-  /// </summary>
+  /// <summary>Tracks all blueprints in the game.</summary>
   /// 
   /// <remarks>
   /// <para>
