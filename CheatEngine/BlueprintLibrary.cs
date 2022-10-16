@@ -170,13 +170,14 @@ namespace CheatEngine
     {
       try
       {
+        // This only impacts search by allowing search to include mod changes to base game blueprints.
         Logger.Log("Updating base game blueprints to reflect mod changes.");
         int throttleCount = 0;
         foreach (var bp in BaseBlueprints)
         {
           LoadedBlueprints[bp.AssetGuid] = ResourcesLibrary.TryGetBlueprint(bp.AssetGuid);
           throttleCount++;
-          if (throttleCount % 17 == 0)
+          if (throttleCount % 17 == 0) // Even 50 / 10 was causing some hitching. Hopefully this is throttled enough.
             Thread.Sleep(17);
         }
         Logger.Log("Done updating base game blueprints.");
@@ -186,7 +187,6 @@ namespace CheatEngine
         Logger.LogException("BlueprintLibrary.IndexBlueprints", e);
       }
     }
-
     #endregion
 
     #region Blueprint Loading
