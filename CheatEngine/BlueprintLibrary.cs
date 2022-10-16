@@ -163,6 +163,32 @@ namespace CheatEngine
       return name is not null && Regex.IsMatch(name, namePattern, RegexOptions.IgnoreCase);
     }
 
+    #region Blueprint Indexing
+    private static Thread IndexThread;
+
+    private static void IndexBlueprints()
+    {
+      try
+      {
+        Logger.Log("Updating base game blueprints to reflect mod changes.");
+        int throttleCount = 0;
+        foreach (var bp in BaseBlueprints)
+        {
+          LoadedBlueprints[bp.AssetGuid] = ResourcesLibrary.TryGetBlueprint(bp.AssetGuid);
+          throttleCount++;
+          if (throttleCount % 17 == 0)
+            Thread.Sleep(17);
+        }
+        Logger.Log("Done updating base game blueprints.");
+      }
+      catch (Exception e)
+      {
+        Logger.LogException("BlueprintLibrary.IndexBlueprints", e);
+      }
+    }
+
+    #endregion
+
     #region Blueprint Loading
     private static SimpleBlueprint[] BaseBlueprints;
     private static Thread LoadThread;
@@ -226,6 +252,9 @@ namespace CheatEngine
         timer.Stop();
 
         Logger.Log($"Finished loading {cacheEntries.Count} blueprints in {timer.Elapsed}");
+
+        IndexThread = new Thread(new ThreadStart(IndexBlueprints));
+        IndexThread.Start();
       }
       catch (Exception e)
       {
