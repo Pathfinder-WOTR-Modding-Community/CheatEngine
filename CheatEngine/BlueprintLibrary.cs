@@ -90,7 +90,7 @@ namespace CheatEngine
         {
           var startIndex = thread * partitionSize;
           var length = thread < NumThreads - 1 ? partitionSize : cacheEntries.Count - startIndex;
-          LoadChild(cacheEntries.GetRange(startIndex, length).ToArray(), startIndex);
+          LoadChild(cacheEntries.GetRange(startIndex, length).ToArray(), startIndex, thread);
         });
 
         foreach (var bp in BaseBlueprints)
@@ -109,11 +109,11 @@ namespace CheatEngine
       }
     }
 
-    private static void LoadChild(uint[] offsets, int startIndex)
+    private static void LoadChild(uint[] offsets, int startIndex, int threadNum)
     {
       try
       {
-        Logger.Log($"{startIndex}: Loading {offsets.Length} blueprints");
+        Logger.Log($"{threadNum}: Loading {offsets.Length} blueprints");
 
         using (
           var packFile =
@@ -138,11 +138,11 @@ namespace CheatEngine
           }
         }
 
-        Logger.Log($"{startIndex}: Done loading blueprints");
+        Logger.Log($"{threadNum}: Done loading blueprints");
       }
       catch (Exception e)
       {
-        Logger.LogException($"BlueprintLibrary.LoadChild-{startIndex}", e);
+        Logger.LogException($"BlueprintLibrary.LoadChild-{threadNum}", e);
       }
     }
 
