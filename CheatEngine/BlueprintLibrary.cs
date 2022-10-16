@@ -1,16 +1,26 @@
 ﻿using CheatEngine.Util;
 using HarmonyLib;
+using Kingmaker.Armies.Blueprints;
 using Kingmaker.Blueprints;
+using Kingmaker.Blueprints.Classes;
+using Kingmaker.Blueprints.Facts;
+using Kingmaker.Blueprints.Items;
 using Kingmaker.Blueprints.JsonSystem;
 using Kingmaker.Blueprints.JsonSystem.BinaryFormat;
 using Kingmaker.Blueprints.JsonSystem.Converters;
 using Kingmaker.BundlesLoading;
+using Kingmaker.Kingdom.Blueprints;
+using Kingmaker.Kingdom.Flags;
+using Kingmaker.Utility;
+using Kingmaker.Visual.Sound;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using static UnityModManagerNet.UnityModManager.ModEntry;
@@ -40,6 +50,96 @@ namespace CheatEngine
 
     private static readonly ConcurrentDictionary<BlueprintGuid, SimpleBlueprint> LoadedBlueprints = new();
 
+    /// <returns>True if blueprints are loaded and searchable.</returns>
+    public static bool ReadyForSearch()
+    {
+      return LoadThread?.ThreadState == System.Threading.ThreadState.Stopped;
+    }
+
+    /// <param name="guidPattern">Regex search string</param>
+    /// <param name="blueprintTypes">If specified, only blueprints of these types are returned</param>
+    /// <returns>
+    /// Blueprints with GUIDs matching <paramref name="guidPattern"/>, of any type in <paramref name="blueprintTypes"/>
+    /// </returns>
+    public static IEnumerable<SimpleBlueprint> SearchByGuid(string guidPattern, params Type[] blueprintTypes)
+    {
+      if (!ReadyForSearch())
+        yield break;
+
+      foreach (var bp in LoadedBlueprints.Values)
+      {
+        if (blueprintTypes.Any() && !blueprintTypes.Contains(type => type == bp.GetType()))
+          continue;
+
+        if (IsLocalizedNameMatch(bp, guidPattern))
+          yield return ResourcesLibrary.TryGetBlueprint(bp.AssetGuid);
+      }
+      yield break;
+    }
+
+    private static bool IsLocalizedDescriptionMatch(SimpleBlueprint bp, string descriptionPattern)
+    {
+      string name = bp switch
+      {
+        BlueprintUnitFact unitFact => unitFact.Description,
+        BlueprintArchetype archetype => archetype.Description,
+        BlueprintAbilityResource resource => resource.Description,
+        BlueprintCharacterClass clazz => clazz.Description,
+        BlueprintItem item => item.Description,
+        BlueprintKingdomBuff kingdomBuff => kingdomBuff.Description,
+        BlueprintKingdomEventBase kingdomEvent => kingdomEvent.LocalizedDescription,
+        BlueprintKingdomMoraleFlag kingdomFlag => kingdomFlag.Description,
+        BlueprintLeaderSkill leaderSkill => leaderSkill.LocalizedDescription,
+        BlueprintRegion region => region.ClaimedDescription,
+        _ => null
+      };
+      return name is not null && Regex.IsMatch(name, descriptionPattern);
+    }
+
+    /// <param name="namePattern">Regex search string</param>
+    /// <param name="blueprintTypes">If specified, only blueprints of these types are returned</param>
+    /// <returns>
+    /// Blueprints with names matching <paramref name="guidPattern"/>, of any type in <paramref name="blueprintTypes"/>
+    /// </returns>
+    public static IEnumerable<SimpleBlueprint> SearchByName(string namePattern, params Type[] blueprintTypes)
+    {
+      if (!ReadyForSearch())
+        yield break;
+
+      foreach (var bp in LoadedBlueprints.Values)
+      {
+        if (blueprintTypes.Any() && !blueprintTypes.Contains(type => type == bp.GetType()))
+          continue;
+
+        else if (Regex.IsMatch(bp.name, namePattern))
+          yield return ResourcesLibrary.TryGetBlueprint(bp.AssetGuid);
+        else if (IsLocalizedNameMatch(bp, namePattern))
+          yield return ResourcesLibrary.TryGetBlueprint(bp.AssetGuid);
+      }
+      yield break;
+    }
+
+    private static bool IsLocalizedNameMatch(SimpleBlueprint bp, string namePattern)
+    {
+      string name = bp switch
+      {
+        BlueprintUnitFact unitFact => unitFact.Name,
+        BlueprintArchetype archetype => archetype.Name,
+        BlueprintAbilityResource resource => resource.Name,
+        BlueprintCharacterClass clazz => clazz.Name,
+        BlueprintItem item => item.Name,
+        BlueprintKingdomBuff kingdomBuff => kingdomBuff.DisplayName,
+        BlueprintKingdomEventBase kingdomEvent => kingdomEvent.DisplayName,
+        BlueprintKingdomMoraleFlag kingdomFlag => kingdomFlag.Name,
+        BlueprintUnitAsksList asksList => asksList.DisplayName,
+        BlueprintLeaderSkill leaderSkill => leaderSkill.LocalizedName,
+        BlueprintRegion region => region.LocalizedName,
+        _ => null,
+      };
+      return name is not null && Regex.IsMatch(name, namePattern);
+    }
+
+    #region Blueprint Loading
     private static SimpleBlueprint[] BaseBlueprints;
     private static Thread LoadThread;
 
@@ -195,5 +295,6 @@ namespace CheatEngine
         }
       }
     }
+    #endregion
   }
 }
