@@ -71,7 +71,7 @@ namespace CheatEngine
         if (blueprintTypes.Any() && !blueprintTypes.Contains(type => type == bp.GetType()))
           continue;
 
-        if (Regex.IsMatch(bp.AssetGuid.ToString(), guidPattern))
+        if (Regex.IsMatch(bp.AssetGuid.ToString(), guidPattern, RegexOptions.IgnoreCase))
           yield return ResourcesLibrary.TryGetBlueprint(bp.AssetGuid);
       }
       yield break;
@@ -106,7 +106,7 @@ namespace CheatEngine
         BlueprintArchetype archetype => archetype.Description,
         BlueprintAbilityResource resource => resource.Description,
         BlueprintCharacterClass clazz => clazz.Description,
-        BlueprintItem item => item.Description,
+        BlueprintItem item => item.m_DescriptionText,
         BlueprintKingdomBuff kingdomBuff => kingdomBuff.Description,
         BlueprintKingdomEventBase kingdomEvent => kingdomEvent.LocalizedDescription,
         BlueprintKingdomMoraleFlag kingdomFlag => kingdomFlag.Description,
@@ -114,7 +114,7 @@ namespace CheatEngine
         BlueprintRegion region => region.ClaimedDescription,
         _ => null
       };
-      return name is not null && Regex.IsMatch(name, descriptionPattern);
+      return name is not null && Regex.IsMatch(name, descriptionPattern, RegexOptions.IgnoreCase);
     }
 
     /// <param name="namePattern">Regex search string</param>
@@ -125,14 +125,17 @@ namespace CheatEngine
     public static IEnumerable<SimpleBlueprint> SearchByName(string namePattern, params Type[] blueprintTypes)
     {
       if (!ReadyForSearch())
+      {
+        Logger.Log("Not ready!");
         yield break;
+      }
 
       foreach (var bp in LoadedBlueprints.Values)
       {
         if (blueprintTypes.Any() && !blueprintTypes.Contains(type => type == bp.GetType()))
           continue;
 
-        else if (Regex.IsMatch(bp.name, namePattern))
+        if (Regex.IsMatch(bp.name, namePattern, RegexOptions.IgnoreCase))
           yield return ResourcesLibrary.TryGetBlueprint(bp.AssetGuid);
         else if (IsLocalizedNameMatch(bp, namePattern))
           yield return ResourcesLibrary.TryGetBlueprint(bp.AssetGuid);
@@ -148,7 +151,7 @@ namespace CheatEngine
         BlueprintArchetype archetype => archetype.Name,
         BlueprintAbilityResource resource => resource.Name,
         BlueprintCharacterClass clazz => clazz.Name,
-        BlueprintItem item => item.Name,
+        BlueprintItem item => item.m_DisplayNameText,
         BlueprintKingdomBuff kingdomBuff => kingdomBuff.DisplayName,
         BlueprintKingdomEventBase kingdomEvent => kingdomEvent.DisplayName,
         BlueprintKingdomMoraleFlag kingdomFlag => kingdomFlag.Name,
@@ -157,7 +160,7 @@ namespace CheatEngine
         BlueprintRegion region => region.LocalizedName,
         _ => null,
       };
-      return name is not null && Regex.IsMatch(name, namePattern);
+      return name is not null && Regex.IsMatch(name, namePattern, RegexOptions.IgnoreCase);
     }
 
     #region Blueprint Loading
