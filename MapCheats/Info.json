@@ -1,0 +1,10 @@
+﻿{
+  "Id": "CheatEngine.Map",
+  "DisplayName": "Map Cheats (Cheat Engine)",
+  "Author": "Bubbles & WittleWolfie",
+  "Version": "0.1.0",
+  "ManagerVersion": "0.21.3",
+  "AssemblyName": "CheatEngine.Map.dll",
+  "EntryMethod": "CheatEngine.Map.Main.Load",
+  "Requirements": [ "CheatEngine" ]
+}
